@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Weekly Report - Juni 2026</title>
+    <!-- Chart.js CDN untuk Visualisasi Data Profesional -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-dark: #fef08a;       /* Light Warm Yellow (Latar Belakang Utama) */
+            --card-dark: #ffffff;     /* Pure White (Latar Belakang Card/Slide) */
+            --accent-yellow: #eab308;   /* Deep Gold Yellow (Aksen Penegas) */
+            --accent-blue: #1d4ed8;     /* Royal Corporate Blue (Elemen Utama / Judul & Parameter) */
+            --accent-soft-blue: #3b82f6;/* Soft Blue (Elemen Grafik & Batang) */
+            --text-light: #1e293b;      /* Dark Slate (Teks Utama Kontras di atas Putih) */
+            --text-muted: #475569;     /* Slate Gray (Teks Deskripsi) */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .slide-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            padding-bottom: 90px;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            background-color: var(--card-dark);
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 10px 30px -5px rgba(234, 179, 8, 0.3);
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 1px solid rgba(29, 78, 216, 0.1);
+        }
+
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { color: var(--accent-blue); margin-bottom: 15px; font-size: 2.8rem; font-weight: 800; }
+        h2 { color: var(--accent-blue); margin-bottom: 12px; font-size: 1.8rem; border-bottom: 2px solid rgba(29, 78, 216, 0.1); padding-bottom: 8px; font-weight: 700; }
+        h3 { color: var(--accent-blue); margin-bottom: 12px; font-size: 1.35rem; font-weight: 600; }
+        p { color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; font-size: 1rem; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .slide { max-height: none; }
+        }
+
+        .stat-card {
+            background-color: #f8fafc;
+            border-left: 4px solid var(--accent-blue);
+            padding: 15px 18px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .stat-card.instagram { border-left-color: var(--accent-blue); }
+        .stat-card.tiktok { border-left-color: var(--accent-soft-blue); }
+        .stat-card.kuahin { border-left-color: var(--accent-blue); }
+        .stat-card.success { border-left-color: var(--accent-blue); }
+
+        .stat-value { font-size: 1.8rem; font-weight: bold; margin-top: 5px; color: var(--accent-blue); }
+        .stat-sub { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th { background-color: #f1f5f9; color: var(--accent-blue); font-weight: 700; }
+        tr:hover { background-color: #f8fafc; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .badge.achieved { background-color: rgba(29, 78, 216, 0.1); color: var(--accent-blue); border: 1px solid rgba(29, 78, 216, 0.2); }
+        .badge.pending { background-color: rgba(59, 130, 246, 0.1); color: var(--accent-soft-blue); border: 1px solid rgba(59, 130, 246, 0.2); }
+        .badge.kuahin-tag { background-color: #f1f5f9; color: var(--text-muted); border: 1px solid #cbd5e1; }
+        .badge.growth-up { background-color: rgba(29, 78, 216, 0.08); color: var(--accent-blue); font-weight: 700; }
+        .badge.growth-down { background-color: #f1f5f9; color: var(--text-muted); }
+
+        .btn-link {
+            display: inline-block;
+            background-color: var(--accent-blue);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            margin-top: 5px;
+            box-shadow: 0 2px 4px rgba(29, 78, 216, 0.2);
+        }
+        .btn-link:hover { background-color: var(--accent-soft-blue); transform: translateY(-1px); }
+        .btn-link.tiktok-btn { background-color: transparent; border: 1px solid var(--accent-blue); color: var(--accent-blue); box-shadow: none; }
+        .btn-link.tiktok-btn:hover { background-color: rgba(29, 78, 216, 0.05); }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            margin-top: 10px;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px; 
+            background-color: #ffffff; 
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100; 
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+        }
+
+        button {
+            background-color: #ffffff;
+            color: var(--text-muted);
+            border: 1px solid #cbd5e1;
+            padding: 10px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        button:hover { background-color: var(--accent-blue); color: #ffffff; border-color: var(--accent-blue); }
+
+        .dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; background-color: #cbd5e1; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; }
+        .dot.active { background-color: var(--accent-blue); transform: scale(1.2); box-shadow: 0 0 8px rgba(29, 78, 216, 0.4); }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container">
+        <!-- Slide 1: Cover Halaman Depan -->
+        <div class="slide active">
+            <div style="text-align: center; margin-top: 5vh;">
+                <span style="color: var(--accent-blue); font-weight: 800; letter-spacing: 3px; font-size: 0.9rem;">MARKETING PERFORMANCE DECISION DECK</span>
+                <h1 style="margin-top: 15px; line-height: 1.2;">Cross-Platform Analytics<br>& Growth Strategy Report</h1>
+                <p style="font-size: 1.3rem; max-width: 800px; margin: 20px auto 40px; color: var(--text-muted);">
+                    Laporan Evaluasi Mingguan Lintas Platform: Optimasi Trafik Organik & Validasi Target KPI
+                </p>
+                <div style="background: rgba(29, 78, 216, 0.05); display: inline-block; padding: 10px 25px; border-radius: 30px; border: 1px solid rgba(29, 78, 216, 0.1);">
+                    <span style="color: var(--accent-blue); font-weight: 600;">Periode Laporan:</span> 01 Juni – 12 Juni 2026
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Status Pemenuhan Target KPI -->
+        <div class="slide">
+            <h2>Status Matriks Pemenuhan Target KPI Utama</h2>
+            <p>Evaluasi objektif terhadap parameter target operasional mingguan yang telah ditetapkan dalam strategi pemasaran.</p>
+            <table style="margin-top: 20px;">
+                <thead>
+                    <tr>
+                        <th>Parameter Key Performance Indicators (KPI)</th>
+                        <th>Target Threshold Baseline</th>
+                        <th>Realisasi Berjalan (1-12 Juni)</th>
+                        <th>Status Evaluasi Capaian</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><b>1. Audience Acquisition (Followers)</b></td><td>+1.000 / Bulan / Platform</td><td>IG: +176 Net | TT: +64 Net Followers</td><td><span class="badge pending">On-Track Progress</span></td></tr>
+                    <tr><td><b>2. Organic Explosive Virality Share</b></td><td>Minimal 100.000 Views / Konten</td><td>IG Reels: <b>694K+ Views</b> | TT: <b>1,34M+ Gross Views</b></td><td><span class="badge achieved">KPI EXCEEDED (SUPER VIRAL)</span></td></tr>
+                    <tr><td><b>3. Inbound Interest Pipeline</b></td><td>Skala Prospek Kontrak Layanan</td><td>Trafik Kunjungan Profil Mengalami Lonjakan Tinggi</td><td><span class="badge achieved">HIGH POTENTIAL</span></td></tr>
+                    <tr><td><b>4. TikTok Sesi LIVE Stream</b></td><td>Maksimal 2 Jam / Hari</td><td>Aktif Terlaksana Konsisten Sesuai Protokol</td><td><span class="badge achieved">COMPLIANT</span></td></tr>
+                    <tr><td><b>5. Content Upload Frequency</b></td><td>1 Konten / Hari / Channel</td><td>IG: Eksplorasi Masif | Lini Kuahin Stabil Berjalan</td><td><span class="badge achieved">100% KONSISTEN</span></td></tr>
+                    <tr><td><b>6. Daily Activity Logs Report</b></td><td>Rekapitulasi Aktivitas Harian</td><td>Pelaporan Log Harian Terkirim Lengkap & Akurat</td><td><span class="badge achieved">EFEKTIF</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide 3: Cross-Platform Core Funnel Overview -->
+        <div class="slide">
+            <h2>Social Media Multi-Platform Funnel Aggregation</h2>
+            <p>Kompilasi volume performa makro untuk mengukur efisiensi jangkauan (*reach amplification share*) di seluruh saluran digital.</p>
+            
+            <div class="grid-4" style="margin-bottom: 30px;">
+                <div class="stat-card">
+                    <div style="color: var(--text-muted); font-size: 0.9rem;">Aggregated Reach</div>
+                    <div class="stat-value">1.707.717</div>
+                    <div class="stat-sub">Total Jangkauan Akun Unik</div>
+                </div>
+                <div class="stat-card">
+                    <div style="color: var(--text-muted); font-size: 0.9rem;">Gross Impressions</div>
+                    <div class="stat-value" style="color: var(--accent-soft-blue);">1.981.315</div>
+                    <div class="stat-sub">Total Pemaparan Konten</div>
+                </div>
+                <div class="stat-card">
+                    <div style="color: var(--text-muted); font-size: 0.9rem;">Profile Interest Actions</div>
+                    <div class="stat-value" style="color: var(--accent-soft-blue);">18.350</div>
+                    <div class="stat-sub">Kunjungan Halaman Profil</div>
+                </div>
+                <div class="stat-card">
+                    <div style="color: var(--text-muted); font-size: 0.9rem;">Gross Engagement</div>
+                    <div class="stat-value" style="color: var(--text-light);">76.234</div>
+                    <div class="stat-sub">Total Likes, Comments, Shares</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="stat-card" style="background: #f8fafc; border-left-color: var(--accent-blue);">
+                    <h3>Efisiensi Saluran Distribusi Organik</h3>
+                    <p style="font-size: 0.95rem; margin-top: 10px; margin-bottom: 0;">
+                        Sinergi penayangan antara ekosistem Meta dan TikTok berhasil menembus pasar baru secara eksponensial. TikTok bertindak sebagai pengumpul volume impresi massa berskala besar (*top-of-funnel reach generator*), sedangkan Instagram Suite menjadi jangkar penarik konversi ketertarikan merek (*mid-funnel brand curiosity*) yang kuat.
+                    </p>
+                </div>
+                <div>
+                    <div class="chart-container" style="height: 180px;">
+                        <canvas id="summaryBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Meta Instagram Analytics Macro Data -->
+        <div class="slide">
+            <h2>Instagram Performance Metrics Dashboard</h2>
+            <p>Pertumbuhan volume sebaran organik berjalan sangat masif, dipicu oleh efektivitas penyebaran konten non-pengikut.</p>
+            
+            <div class="grid-4" style="margin-bottom: 25px;">
+                <div class="stat-card instagram">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Gross Impressions</div>
+                    <div class="stat-value">640.301</div>
+                    <div class="stat-sub"><span class="badge growth-up">⬆ +50,9%</span> MoM Growth</div>
+                </div>
+                <div class="stat-card instagram">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Unique Account Reach</div>
+                    <div class="stat-value">384.505</div>
+                    <div class="stat-sub"><span class="badge growth-up">⬆ 93,9% Non-Followers</span></div>
+                </div>
+                <div class="stat-card instagram">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Content Interaction</div>
+                    <div class="stat-value">11.500</div>
+                    <div class="stat-sub"><span class="badge growth-up">⬆ +41,2%</span> MoM Growth</div>
+                </div>
+                <div class="stat-card instagram">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Profile Visits Traffic</div>
+                    <div class="stat-value">6.300</div>
+                    <div class="stat-sub"><span class="badge growth-up">⬆ +811,7%</span> MoM Growth</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="igDetailedLineChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Slide 5: Meta Instagram Behavioral Breakdown -->
+        <div class="slide">
+            <h2>Instagram Audience Engagement Breakdown</h2>
+            <p>Pembedahan mendalam terhadap perilaku audiens menunjukkan daya tarik konten yang tinggi pada pasar eksplorasi (*cold market*).</p>
+            
+            <div class="grid-2">
+                <div>
+                    <table>
+                        <thead>
+                            <tr><th>Audience Engagement Stream</th><th>Volume</th><th>Persentase / Kondisi Aktual</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Impression Share by Audience</td><td>640.301</td><td>6,1% Followers | 93,9% Non-Followers</td></tr>
+                            <tr><td>Reach Amplification Share</td><td>384.505</td><td>5.509 Followers | 378.996 Non-Followers</td></tr>
+                            <tr><td>Interaction Source Share</td><td>11.500</td><td>3% Followers | 97% Non-Followers</td></tr>
+                            <tr><td>Link Clicks Conversion (CTA)</td><td>209</td><td><span class="badge up">⬆ +100% Action Click Rate</span></td></tr>
+                            <tr><td>Gross Follower Acquisition</td><td>176</td><td><span class="badge up">⬆ +122,8% Inbound Growth</span></td></tr>
+                            <tr><td>Audience Churn (Unfollows)</td><td>209</td><td><span class="badge down">⬇ -65,5% Penyusutan Kebocoran</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="stat-card instagram" style="display: flex; flex-direction: column; justify-content: center; background: #f8fafc;">
+                    <h3>Validasi Mekanisme Konten Viral (KPI 2)</h3>
+                    <p style="font-size: 0.95rem; margin-top: 10px; margin-bottom: 12px; line-height: 1.6;">
+                        Konten eksplorasi bertema <b>"sehat selalu ya mas... #karuniajayapentol"</b> yang dipublikasikan pada 5 Juni pukul 10.57 sukses mencatatkan rekor distribusi tertinggi harian dengan perolehan **694.000+ Tayangan** serta **8.200+ Likes** dalam kurun waktu satu minggu berjalan.
+                    </p>
+                    <a href="https://www.instagram.com/reel/DZMJyDtROnu/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==" target="_blank" class="btn-link">
+                        🔗 Buka Pembuktian Konten di Instagram
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: TikTok Analytics Macro Dashboard -->
+        <div class="slide">
+            <h2>TikTok Platform Growth Analytics Performance</h2>
+            <p>Ekosistem TikTok sukses menembus rekor pencapaian paparan distribusi konten dalam skala jutaan penayangan video.</p>
+            
+            <div class="grid-4" style="margin-bottom: 25px;">
+                <div class="stat-card tiktok">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Gross Video Views</div>
+                    <div class="stat-value">1.341.014</div>
+                    <div class="stat-sub">Milestone 1.3M+ Terlampaui</div>
+                </div>
+                <div class="stat-card tiktok">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Audience Reached</div>
+                    <div class="stat-value">1.323.212</div>
+                    <div class="stat-sub">High Penetration Rate</div>
+                </div>
+                <div class="stat-card tiktok">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Profile Views Traffic</div>
+                    <div class="stat-value">12.050</div>
+                    <div class="stat-sub">Brand Consideration Traffic</div>
+                </div>
+                <div class="stat-card tiktok">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Net Follower Growth</div>
+                    <div class="stat-value">64</div>
+                    <div class="stat-sub"><span class="badge growth-up">Gross Enter: +155 Acct</span></div>
+                </div>
+            </div>
+
+            <div class="grid-3" style="margin-top: 15px;">
+                <div class="stat-card tiktok" style="border-left-color: var(--accent-blue);">
+                    <div style="font-size: 0.9rem; color: var(--text-muted);">Content Likes</div>
+                    <div style="font-size: 1.4rem; font-weight: bold; margin-top: 5px;">49.211</div>
+                </div>
+                <div class="stat-card tiktok" style="border-left-color: var(--accent-soft-blue);">
+                    <div style="font-size: 0.9rem; color: var(--text-muted);">Content Comments</div>
+                    <div style="font-size: 1.4rem; font-weight: bold; margin-top: 5px;">917</div>
+                </div>
+                <div class="stat-card tiktok" style="border-left-color: var(--text-light);">
+                    <div style="font-size: 0.9rem; color: var(--text-muted);">Content Shares</div>
+                    <div style="font-size: 1.4rem; font-weight: bold; margin-top: 5px;">14.606</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: TikTok Persona & Demographic Breakdown -->
+        <div class="slide">
+            <h2>TikTok Audience Demographics & Persona Analysis</h2>
+            <p>Pembedahan struktur profil penonton video mendeteksi adanya konsentrasi penonton pria usia produktif secara mutlak.</p>
+            
+            <div class="grid-2" style="margin-top: 15px;">
+                <div>
+                    <h3 style="text-align: center; font-size: 1.1rem; color: var(--accent-blue); margin-bottom: 15px;">Gender Distribution Structure</h3>
+                    <div class="chart-container" style="height: 180px;">
+                        <canvas id="ttGenderPieChart"></canvas>
+                    </div>
+                    <p style="font-size: 0.85rem; text-align: center; margin-top: 15px; color: var(--text-muted);">
+                        Terjadi polarisasi demografi ekstrem menuju segmen penonton <b style="color: var(--accent-blue);">Laki-laki (99,2%)</b>.
+                    </p>
+                </div>
+                <div>
+                    <h3 style="text-align: center; font-size: 1.1rem; color: var(--accent-soft-blue); margin-bottom: 15px;">Age Segment Breakdown</h3>
+                    <div class="chart-container" style="height: 180px;">
+                        <canvas id="ttAgeBarChart"></canvas>
+                    </div>
+                    <p style="font-size: 0.85rem; text-align: center; margin-top: 15px; color: var(--text-muted);">
+                        Didominasi oleh kelompok usia produktif matang <b style="color: var(--accent-blue);">25–34 Tahun (54,3%)</b>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Sub-Brand Kuahin Framework Tracker -->
+        <div class="slide">
+            <h2>Sub-Brand Ecosystem: Kuahin Performance Matrix</h2>
+            <p>Pilar peninjauan aktivitas khusus untuk melacak penetrasi konten dan sebaran organik lini kemitraan franchise Kuahin.</p>
+            
+            <div class="grid-4" style="margin-bottom: 25px;">
+                <div class="stat-card kuahin">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Kuahin IG Reach</div>
+                    <div class="stat-value">Stable</div>
+                    <div class="stat-sub">Optimasi Distribusi Organik</div>
+                </div>
+                <div class="stat-card kuahin">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Kuahin TikTok Traffic</div>
+                    <div class="stat-value">On-Track</div>
+                    <div class="stat-sub">Visibilitas Segmen Ritel</div>
+                </div>
+                <div class="stat-card kuahin">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Interaction Distribution</div>
+                    <div class="stat-value">Consistent</div>
+                    <div class="stat-sub">Respon Edukasi Terjaga</div>
+                </div>
+                <div class="stat-card kuahin">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Inbound Followers</div>
+                    <div class="stat-value">Secured</div>
+                    <div class="stat-sub">Akuisisi Akun Konsisten</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="stat-card kuahin" style="background: #f8fafc; display: flex; flex-direction: column; justify-content: center;">
+                    <span class="badge kuahin-tag" style="width: fit-content;">B2C CONSUMER AWARENESS</span>
+                    <h3 style="margin-top: 10px; margin-bottom: 5px; color: var(--accent-blue);">Kuahin Official Instagram Insights</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 15px; line-height: 1.5;">
+                        Fokus utama diarahkan pada produksi aset konten penyiaran visual guna menumbuhkan tingkat kepercayaan konsumen (*consumer trust optimization*) terhadap kualitas produk.
+                    </p>
+                    <a href="https://www.instagram.com/reel/DZOwti4voeX/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==" target="_blank" class="btn-link">
+                        🔗 Buka Aset Video Reels Kuahin
+                    </a>
+                </div>
+
+                <div class="stat-card kuahin" style="background: #f8fafc; display: flex; flex-direction: column; justify-content: center; border-left-color: var(--accent-soft-blue);">
+                    <span class="badge achieved" style="width: fit-content;">COMMERCE ENGAGEMENT STREAM</span>
+                    <h3 style="margin-top: 10px; margin-bottom: 5px; color: var(--accent-soft-blue);">Kuahin Official TikTok Stream</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 15px; line-height: 1.5;">
+                        Eksplorasi jangkauan konten video pendek ritel terintegrasi untuk membangun visibilitas (*awareness*) pasar ritel berskala nasional secara luas.
+                    </p>
+                    <a href="https://www.tiktok.com/@kuahin.official/video/7648131928155082005?is_from_webapp=1&sender_device=pc&web_id=7621788547502867989" target="_blank" class="btn-link tiktok-btn">
+                        🔗 Buka Eksplorasi Video Kuahin
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: TikTok Live Commerce & Daily Activity Log -->
+        <div class="slide">
+            <h2>TikTok Pusat LIVE Stream Analytics & Daily Logs</h2>
+            <p>Rekapitulasi metrik performa operasional penyiaran langsung (*LIVE Stream*) terverifikasi dari data aktivitas harian (KPI 4 & 6).</p>
+            
+            <div class="grid-4" style="margin-bottom: 20px;">
+                <div class="stat-card tiktok">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Total LIVE Room Exposure</div>
+                    <div class="stat-value">424</div>
+                    <div class="stat-sub">Unique Viewer Pemaparan</div>
+                </div>
+                <div class="stat-card tiktok">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">LIVE Engagement (Likes)</div>
+                    <div class="stat-value">487</div>
+                    <div class="stat-sub">Interaksi Aktif Real-Time</div>
+                </div>
+                <div class="stat-card tiktok">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Accumulated Airtime</div>
+                    <div class="stat-value">52 Menit</div>
+                    <div class="stat-sub">Total Waktu On-Air</div>
+                </div>
+                <div class="stat-card success">
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Daily Recaps Compliance</div>
+                    <div class="stat-value">100%</div>
+                    <div class="stat-sub">Log Aktivitas Terintegrasi</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div>
+                    <h3>Log Sesi LIVE Aktual Pabrik Pasuruan</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama Sesi / Penyiaran Lokasi</th>
+                                <th>Waktu Mengudara</th>
+                                <th>Durasi Bersih</th>
+                                <th>Tayangan Room</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><b>LIVE PABRIK KARUNIA JAYA...</b></td><td>6 Jun 2026, 2.03 PM</td><td>21 Menit 3 Detik</td><td style="color: var(--accent-blue); font-weight: bold;">189</td></tr>
+                            <tr><td><b>LIVE PABRIK KARUNIA JAYA...</b></td><td>5 Jun 2026, 2.46 PM</td><td>19 Menit 32 Detik</td><td style="color: var(--accent-blue); font-weight: bold;">232</td></tr>
+                            <tr><td><b>LIVE PABRIK KARUNIA JAYA...</b></td><td>4 Jun 2026, 2.37 PM</td><td>28 Menit 36 Detik</td><td style="color: var(--accent-blue); font-weight: bold;">192</td></tr>
+                            <tr><td><b>LIVE PABRIK KARUNIA JAYA...</b></td><td>4 Jun 2026, 2.31 PM</td><td>4 Menit 3 Detik</td><td style="color: var(--accent-blue); font-weight: bold;">0</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <h3 style="text-align: center; font-size: 1.05rem; color: var(--accent-blue);">LIVE Viewer Audience Persona (Female Dominant)</h3>
+                    <div class="chart-container" style="height: 160px;">
+                        <canvas id="ttLiveGenderPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Rencana Aksi & Roadmap Juni -->
+        <div class="slide">
+            <h2>Strategic Growth Roadmap - Rencana Aksi Lanjutan</h2>
+            <p>Rekomendasi taktis berbasis data untuk memperkuat retensi serta mengonversi volume trafik masif menjadi kestabilan brand equity.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+                <div style="background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #cbd5e1; border-left: 5px solid var(--accent-blue);">
+                    <h3 style="color: var(--accent-blue);">1. Corporate Profile Strategy & Bio Update</h3>
+                    <p style="margin-bottom: 0; margin-top: 5px; font-size: 0.95rem;">
+                        Magnet penarik audiens dari pilar konten *Professional Vlog* sudah bekerja secara optimal (mencapai gabungan **18K+ kunjungan profil**). Untuk memperbesar rasio konversi pengikut, perbarui penulisan biografi profil dengan memfokuskan langsung pada pesan nilai utama merek (*Value Proposition*).
+                    </p>
+                </div>
+
+                <div style="background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #cbd5e1; border-left: 5px solid var(--accent-soft-blue);">
+                    <h3 style="color: var(--accent-soft-blue);">2. Diferensiasi Distribusi Konten (Dual-Track Allocation)</h3>
+                    <p style="margin-bottom: 0; margin-top: 5px; font-size: 0.95rem;">
+                        <b>Di TikTok Channel</b>: Maksimalkan traksi pasar pria usia produktif (25-34 tahun) dengan konsisten menayangkan studi kasus operasional, keputusan bisnis riil, serta rekapitulasi performa kerja pabrik yang lugas. <br>
+                        <b>Di Instagram Channel</b>: Tarik pasar perempuan dengan mengedepankan konten bernarasi visual estetis, tips pertumbuhan karir, serta penataan gaya hidup harian profesional yang rapi.
+                    </p>
+                </div>
+
+                <div style="background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #cbd5e1; border-left: 5px solid var(--text-light);">
+                    <h3 style="color: var(--text-light);">3. Sinkronisasi Jadwal Unggah Sesuai Data Peak Activity</h3>
+                    <p style="margin-bottom: 0; margin-top: 5px; font-size: 0.95rem;">
+                        Guna mempertahankan performa jutaan views di TikTok, lakukan pengunggahan konten video 30-45 menit sebelum terjadinya lonjakan keaktifan audiens malam hari, yaitu konsisten di area jadwal **pukul 16.30 dan 19.15** untuk mengamankan posisi awal di algoritma FYP.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel Kontrol Navigasi Bawah Terpasang Presisi -->
+    <div class="controls">
+        <button id="prevBtn" onclick="changeSlide(-1)">Sebelumnya</button>
+        <div class="dots" id="dotsContainer"></div>
+        <button id="nextBtn" onclick="changeSlide(1)">Berikutnya</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dotsContainer = document.getElementById('dotsContainer');
+
+        // Render DOTS navigasi dinamis berdasarkan 10 slide utama
+        slides.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (index === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => {
+                currentSlide = index;
+                updateSlideDisplay();
+            });
+            dotsContainer.appendChild(dot);
+        });
+
+        function updateSlideDisplay() {
+            const dynamicDots = document.querySelectorAll('.dot');
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+            dynamicDots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlideDisplay();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // 1. Bar Chart Komparatif Lintas Platform (Slide 3)
+            const ctxSummary = document.getElementById('summaryBarChart').getContext('2d');
+            new Chart(ctxSummary, {
+                type: 'bar',
+                data: {
+                    labels: ['Instagram (Meta)', 'TikTok'],
+                    datasets: [{
+                        label: 'Unique Reach',
+                        data: [384505, 1323212],
+                        backgroundColor: '#1d4ed8',
+                        borderRadius: 6
+                    }, {
+                        label: 'Gross Impressions',
+                        data: [640301, 1341014],
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: '#475569', font: { size: 10 } }, grid: { display: false } },
+                        y: { ticks: { color: '#475569' }, grid: { color: '#e2e8f0' } }
+                    }
+                }
+            });
+
+            // 2. Line Chart Historis Aliran Trafik Instagram (Slide 4)
+            const ctxIgDetailed = document.getElementById('igDetailedLineChart').getContext('2d');
+            new Chart(ctxIgDetailed, {
+                type: 'line',
+                data: {
+                    labels: ['1-3 Jun', '4 Jun', '5 Jun (Spike 1)', '6-8 Jun', '9-11 Jun (Viral Peak)', '12 Jun'],
+                    datasets: [{
+                        label: 'Organic Traffic Volume Trends',
+                        data: [25000, 30000, 90000, 45000, 140000, 54301],
+                        borderColor: '#1d4ed8',
+                        backgroundColor: 'rgba(29, 78, 216, 0.05)',
+                        fill: true,
+                        tension: 0.25
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#1e293b' } } },
+                    scales: {
+                        x: { ticks: { color: '#475569' }, grid: { display: false } },
+                        y: { ticks: { color: '#475569' }, grid: { color: '#e2e8f0' } }
+                    }
+                }
+            });
+
+            // 3. Pie Chart Demografi Gender Konten Video TikTok (Slide 7)
+            const ctxTtGender = document.getElementById('ttGenderPieChart').getContext('2d');
+            new Chart(ctxTtGender, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Laki-laki (99.2%)', 'Perempuan (0.8%)'],
+                    datasets: [{
+                        data: [99.2, 0.8],
+                        backgroundColor: ['#1d4ed8', '#cbd5e1'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { color: '#1e293b', font: { size: 11 } } } }
+                }
+            });
+
+            // 4. Bar Chart Rentang Usia TikTok Video (Slide 7)
+            const ctxTtAge = document.getElementById('ttAgeBarChart').getContext('2d');
+            new Chart(ctxTtAge, {
+                type: 'bar',
+                data: {
+                    labels: ['25-34 th', '18-24 th', '35-44 th', '45-54 th', '55+ th'],
+                    datasets: [{
+                        data: [54.3, 22.3, 13.8, 6.4, 3.2],
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: '#475569', font: { size: 10 } }, grid: { display: false } },
+                        y: { ticks: { color: '#475569' }, grid: { color: '#e2e8f0' } }
+                    }
+                }
+            });
+
+            // 5. Doughnut Chart Demografi Penonton LIVE TikTok (Slide 9)
+            const ctxTtLiveGender = document.getElementById('ttLiveGenderPieChart').getContext('2d');
+            new Chart(ctxTtLiveGender, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Perempuan (74%)', 'Laki-laki (26%)'],
+                    datasets: [{
+                        data: [74, 26],
+                        backgroundColor: ['#3b82f6', '#1d4ed8'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { color: '#1e293b', font: { size: 11 } } } }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
